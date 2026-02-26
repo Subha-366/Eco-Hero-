@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Eco Hero – Admin Panel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #2e7d32, #81c784);
+      margin: 0;
+      padding: 20px;
+      color: #fff;
+    }
+    
+
+
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .panel {
+      background: white;
+      color: #333;
+      border-radius: 14px;
+      padding: 20px;
+      max-width: 700px;
+      margin: 20px auto;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+
+    .stat {
+      font-size: 18px;
+      margin: 10px 0;
+      font-weight: bold;
+    }
+
+    button {
+      padding: 12px 18px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      margin: 6px 0;
+    }
+
+    .danger {
+      background: #e53935;
+      color: white;
+    }
+
+    .warning {
+      background: #ff9800;
+      color: white;
+    }
+
+    .safe {
+      background: #2e7d32;
+      color: white;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      background: #f1f1f1;
+      margin: 6px 0;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .timestamp {
+      font-size: 14px;
+      color: #555;
+      margin-top: 10px;
+    }
+
+    table th, table td {
+  padding: 8px;
+  border: 1px solid #ccc;
+  text-align: center;
+  font-size: 14px;
+}
+
+table tbody tr:nth-child(even) {
+  background: #f9f9f9;
+}
+
+
+
+
+  </style>
+</head>
+
+<body>
+
+<h1>🛠️ Eco Hero – Admin Panel</h1>
+
+<div class="panel">
+  <div class="stat">👥 Total Users: <span id="userCount">0</span></div>
+  <div class="stat">📊 Total Records: <span id="recordCount">0</span></div>
+  <div class="timestamp">⏱️ Last Reset: <span id="lastReset">Never</span></div>
+</div>
+
+<div class="panel">
+  <h3>👤 Registered Users List</h3>
+  <div id="userList"></div>
+
+</div>
+
+<div class="panel">
+  <h3>⚠️ Admin Actions</h3>
+
+  <button class="warning" onclick="clearGuestData()">🧹 Clear Guest Scores</button><br>
+
+  <button class="danger" onclick="resetLeaderboard()">🔥 Reset Leaderboard (Permanent)</button><br>
+
+  <button class="safe" onclick="goBack()">⬅ Back to Game</button>
+
+  <button class="danger" onclick="clearGuestPermanently()">
+  ❌ Delete Guest Scores Permanently
+</button>
+
+
+
+
+
+</div>
+
+<script>
+/* ===== SAME STORAGE KEYS AS YOUR GAME ===== */
+const LS_LEADERBOARD = "ecohero_leaderboard";
+const LAST_RESET_KEY = "ecohero_last_reset";
+
+/* ===== LOAD DATA ===== */
+function loadAdminData() {
+  const records = JSON.parse(localStorage.getItem(LS_LEADERBOARD)) || [];
+
+  document.getElementById("recordCount").textContent = records.length;
+
+  const uniqueUsers = [...new Set(
+    records
+      .map(r => r.player_name)
+      .filter(name => name && name !== "Anonymous")
+  )];
+
+  document.getElementById("userCount").textContent = uniqueUsers.length;
+
+  const list = document.getElementById("userList");
+  list.innerHTML = "";
+
+  if (uniqueUsers.length === 0) {
+    list.innerHTML = "<li>No registered users</li>";
+  } else {
+    uniqueUsers.forEach(user => {
+      const li = document.createElement("li");
+      li.textContent = user;
+      list.appendChild(li);
+    });
+  }
+
+  const lastReset = localStorage.getItem(LAST_RESET_KEY);
+  document.getElementById("lastReset").textContent =
+    lastReset ? new Date(lastReset).toLocaleString() : "Never";
+}
+
+/* ===== CLEAR GUEST DATA ONLY ===== */
+function clearGuestData() {
+  const records = JSON.parse(localStorage.getItem(LS_LEADERBOARD)) || [];
+
+  const filtered = records.filter(r =>
+    r.player_name && r.player_name !== "Anonymous"
+  );
+
+  localStorage.setItem(LS_LEADERBOARD, JSON.stringify(filtered));
+
+  alert("✅ Guest scores cleared successfully");
+  loadAdminData();
+}
+
+
+/* ===== RESET LEADERBOARD PERMANENTLY ===== */
+function resetLeaderboard() {
+  if (!confirm("This will permanently delete leaderboard data. Continue?")) return;
+
+  localStorage.removeItem(LS_LEADERBOARD);
+  localStorage.setItem(LAST_RESET_KEY, new Date().toISOString());
+
+  alert("🔥 Leaderboard reset complete");
+  loadAdminData();
+}
+
+/* ===== NAVIGATION ===== */
+function goBack() {
+  window.location.href = "subha.html";
+}
+
+/* INIT */
+loadAdminData();
+
+
+if (localStorage.getItem("is_admin") !== "true") {
+  alert("Unauthorized access!");
+  window.location.href = "login.html";
+}
+
+function clearGuestScores() {
+  const leaderboard = JSON.parse(localStorage.getItem("ecohero_leaderboard")) || [];
+
+  const filtered = leaderboard.filter(entry => entry.guest === false);
+
+  localStorage.setItem("ecohero_leaderboard", JSON.stringify(filtered));
+}
+
+
+
+
+
+function clearGuestPermanently() {
+  if (!confirm("This will permanently delete ALL guest scores. Continue?")) return;
+
+  const leaderboard = JSON.parse(localStorage.getItem("ecohero_leaderboard")) || [];
+
+  const cleaned = leaderboard.filter(entry => entry.guest === false);
+
+  localStorage.setItem("ecohero_leaderboard", JSON.stringify(cleaned));
+
+  alert("✅ All guest scores permanently deleted");
+  loadAdminData();
+}
+localStorage.setItem("ecohero_last_reset", new Date().toISOString());
+
+
+
+
+</script>
+
+</body>
+</html>

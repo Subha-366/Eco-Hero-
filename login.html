@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nature Game Login</title>
+<style>
+* {margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', sans-serif;}
+body, html {width:100%; height:100%; overflow:hidden; background: linear-gradient(#db8709, #17b2ce); position: relative;}
+.flower, .butterfly {position:absolute; width:40px; height:40px; pointer-events:none;}
+.container {position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); background: rgba(255,255,255,0.85); padding:30px; border-radius:20px; width:300px; text-align:center;}
+h2 {margin-bottom:20px; color:#333;}
+input[type=text], input[type=password] {width:100%; padding:10px; margin:10px 0; border-radius:10px; border:1px solid #ccc;}
+button {padding:10px 20px; border:none; border-radius:10px; background:#4CAF50; color:#fff; cursor:pointer; margin-top:10px;}
+button:hover {background:#45a049;}
+a {cursor:pointer; display:block; margin-top:10px; color:#555; text-decoration:underline;}
+label {display:flex; align-items:center; justify-content:flex-start; margin-top:10px; font-size:12px;}
+label input {margin-right:5px;}
+
+
+</style>
+</head>
+<body>
+
+<div class="container" id="auth-container">
+    <h2 id="form-title">Login</h2>
+
+    <!-- Login Form -->
+    <div id="login-form">
+        <input type="text" id="login-username" placeholder="Username" required>
+        <input type="password" id="login-password" placeholder="Password" required>
+        <label><input type="checkbox" id="accept-terms"> I accept <a onclick="showTerms()">Terms & Conditions</a> and <a onclick="showPrivacy()">Privacy Policy</a></label>
+        <button onclick="loginUser()">Login</button>
+        <a onclick="showRegister()">Register</a>
+        <a onclick="showForgot()">Forgot Password?</a>
+        <button onclick="playAsGuest()" style="background:#81c784">
+  🎮 Play as Guest
+        </button>
+        <button onclick="adminLogin()" style="background:#455a64">
+  🛠️ Admin Panel
+</button>
+
+
+
+    </div>
+
+    <!-- Register Form -->
+    <div id="register-form" style="display:none;">
+        <input type="text" id="register-username" placeholder="Username" required>
+        <input type="password" id="register-password" placeholder="Password" required>
+        <label><input type="checkbox" id="accept-terms-register"> I accept <a onclick="showTerms()">Terms & Conditions</a> and <a onclick="showPrivacy()">Privacy Policy</a></label>
+        <button onclick="registerUser()">Register</button>
+        <a onclick="showLogin()">Back to Login</a>
+    </div>
+
+    <!-- Forgot Password -->
+    <div id="forgot-form" style="display:none;">
+        <input type="text" id="forgot-username" placeholder="Username" required>
+        <button onclick="sendReset()">Send Reset Link</button>
+        <a onclick="showLogin()">Back to Login</a>
+    </div>
+
+    <!-- Reset Password -->
+    <div id="reset-form" style="display:none;">
+        <input type="password" id="reset-password" placeholder="New Password" required>
+        <button onclick="resetPassword()">Reset Password</button>
+        <a onclick="showLogin()">Back to Login</a>
+    </div>
+</div>
+
+<!-- Nature Sound -->
+<audio id="nature-sound" loop autoplay>
+  <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+</audio>
+<button id="soundBtn">🔊 Enable Nature Sound</button>
+
+
+
+<script>
+// ---------- Nature Elements ----------
+const flowers = ['🌸','🌼','🌺','🌻'];
+const butterflies = ['🦋','🦋','🦋'];
+for(let i=0;i<20;i++){
+    let f=document.createElement('div'); f.className='flower'; f.textContent=flowers[Math.floor(Math.random()*flowers.length)]; f.style.top=Math.random()*100+'%'; f.style.left=Math.random()*100+'%'; f.style.fontSize=(10+Math.random()*20)+'px'; document.body.appendChild(f);
+}
+for(let i=0;i<10;i++){
+    let b=document.createElement('div'); b.className='butterfly'; b.textContent=butterflies[Math.floor(Math.random()*butterflies.length)]; b.style.top=Math.random()*100+'%'; b.style.left=Math.random()*100+'%'; b.style.fontSize=(20+Math.random()*20)+'px'; document.body.appendChild(b);
+}
+setInterval(()=>{
+    document.querySelectorAll('.flower, .butterfly').forEach(el=>{
+        el.style.top=parseFloat(el.style.top)+Math.random()*1+'%';
+        el.style.left=parseFloat(el.style.left)+Math.random()*1+'%';
+        if(parseFloat(el.style.top)>100) el.style.top='0%';
+        if(parseFloat(el.style.left)>100) el.style.left='0%';
+    });
+},100);
+
+// ---------- Forms ----------
+function showRegister(){ document.getElementById('login-form').style.display='none'; document.getElementById('register-form').style.display='block'; document.getElementById('forgot-form').style.display='none'; document.getElementById('reset-form').style.display='none'; document.getElementById('form-title').innerText='Register'; }
+function showLogin(){ document.getElementById('login-form').style.display='block'; document.getElementById('register-form').style.display='none'; document.getElementById('forgot-form').style.display='none'; document.getElementById('reset-form').style.display='none'; document.getElementById('form-title').innerText='Login'; }
+function showForgot(){ document.getElementById('login-form').style.display='none'; document.getElementById('register-form').style.display='none'; document.getElementById('forgot-form').style.display='block'; document.getElementById('reset-form').style.display='none'; document.getElementById('form-title').innerText='Forgot Password'; }
+function showReset(){ document.getElementById('login-form').style.display='none'; document.getElementById('register-form').style.display='none'; document.getElementById('forgot-form').style.display='none'; document.getElementById('reset-form').style.display='block'; document.getElementById('form-title').innerText='Reset Password'; }
+
+// ---------- Storage & Auth ----------
+function registerUser(){
+    let u=document.getElementById('register-username').value.trim();
+    let p=document.getElementById('register-password').value;
+    let accept=document.getElementById('accept-terms-register').checked;
+    if(!accept){alert('You must accept T&C and Privacy Policy'); return;}
+    if(!u||!p){alert('Enter username & password'); return;}
+    if(localStorage.getItem('user_'+u)){alert('Username exists'); return;}
+    localStorage.setItem('user_'+u, JSON.stringify({password:p, score:0}));
+    alert('Registered! Please login.');
+    showLogin();
+}
+const audio = document.getElementById("nature-sound");
+
+document.getElementById("soundBtn").addEventListener("click", () => {
+  audio.play().catch(err => console.log(err));
+});
+
+
+
+
+function loginUser(){
+    let u=document.getElementById('login-username').value.trim();
+    let p=document.getElementById('login-password').value;
+    let accept=document.getElementById('accept-terms').checked;
+    if(!accept){alert('You must accept T&C and Privacy Policy'); return;}
+    let user=JSON.parse(localStorage.getItem('user_'+u));
+    if(user && user.password===p){
+        localStorage.setItem('current_user', u);
+        window.location.href='subha.html'; // redirect to your game
+    }else{alert('Invalid credentials');}
+}
+
+function sendReset(){
+    let u=document.getElementById('forgot-username').value.trim();
+    if(!localStorage.getItem('user_'+u)){alert('User not found'); return;}
+    localStorage.setItem('reset_user', u);
+    alert('You can now reset your password');
+    showReset();
+}
+
+function resetPassword(){
+    let u=localStorage.getItem('reset_user');
+    let p=document.getElementById('reset-password').value;
+    if(!p){alert('Enter new password'); return;}
+    let user=JSON.parse(localStorage.getItem('user_'+u));
+    user.password=p;
+    localStorage.setItem('user_'+u, JSON.stringify(user));
+    alert('Password reset!');
+    localStorage.removeItem('reset_user');
+    showLogin();
+}
+
+function playAsGuest() {
+  localStorage.removeItem("current_user"); // ensure guest mode
+  localStorage.setItem("guest_mode", "true");
+  window.location.href = "subha.html"; // go to game
+}
+
+
+// ---------- T&C & Privacy ----------
+function showTerms(){alert('Terms & Conditions: Use this game responsibly.');}
+function showPrivacy(){alert('Privacy Policy: We do not share your data.');}
+
+
+const ADMIN_PASSWORD = "admin123"; // change this for safety
+
+function adminLogin() {
+  const pwd = prompt("Enter Admin Password:");
+  if (pwd === ADMIN_PASSWORD) {
+    localStorage.setItem("is_admin", "true");
+    window.location.href = "admin.html";
+  } else {
+    alert("❌ Invalid Admin Password");
+  }
+
+}
+
+
+
+</script>
+
+</div>
+
+</body>
+</html>

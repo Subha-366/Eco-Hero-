@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Eco Hero Certificate</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+body{
+  margin:0;
+  min-height:100vh;
+  background:linear-gradient(180deg,#0f3d2e,#1b5e20);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-family:'Poppins',sans-serif;
+}
+
+/* Blocked Screen */
+#blocked{
+  display:none;
+  color:white;
+  text-align:center;
+}
+
+/* Glass Frame */
+#frame{
+  width:1000px;
+  background:rgba(255,255,255,0.22);
+  backdrop-filter:blur(18px);
+  padding:35px;
+  border-radius:40px;
+  box-shadow:0 50px 90px rgba(0,0,0,.45);
+}
+
+/* Certificate */
+#certificate{
+  background:linear-gradient(#ffffff,#f3faef);
+  border-radius:30px;
+  padding:65px;
+  position:relative;
+  border:12px solid #2e7d32;
+  text-align:center;
+}
+
+/* Watermark text */
+#certificate::before{
+  content:"ECO HERO";
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%) rotate(-30deg);
+  font-size:140px;
+  color:rgba(46,125,50,.05);
+}
+
+
+/* Keep content above watermark */
+#certificate > *{
+  position:relative;
+  z-index:2;
+}
+
+/* Header */
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.logo{width:90px;}
+
+#verifySeal{
+  width:130px;
+  height:130px;
+  border-radius:50%;
+  border:6px solid #2e7d32;
+  background:radial-gradient(circle,#ffffff,#a5d6a7);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:700;
+  color:#1b5e20;
+}
+
+/* Titles */
+h1{
+  font-family:'Playfair Display',serif;
+  font-size:38px;
+  color:#1b5e20;
+  margin:25px 0 5px;
+}
+
+.subtitle{
+  font-size:16px;
+  letter-spacing:1px;
+  color:#388e3c;
+}
+
+/* Ribbon */
+.ribbon{
+  margin:25px auto;
+  display:inline-block;
+  padding:12px 38px;
+  background:linear-gradient(45deg,#2e7d32,#66bb6a);
+  color:white;
+  border-radius:40px;
+  font-weight:600;
+}
+
+/* Recipient */
+.recipient{
+  margin-top:30px;
+  font-size:18px;
+}
+#name{
+  font-family:'Playfair Display',serif;
+  font-size:34px;
+  color:#1b5e20;
+  margin:10px 0;
+}
+
+/* Description */
+.description{
+  width:85%;
+  margin:20px auto;
+  line-height:1.8;
+  font-size:15px;
+  color:#333;
+}
+
+/* Info table */
+.info{
+  width:85%;
+  margin:30px auto;
+}
+.info p{
+  display:flex;
+  justify-content:space-between;
+  padding:6px 0;
+  border-bottom:1px dashed #a5d6a7;
+}
+
+/* Score box */
+.score{
+  margin:30px auto;
+  width:280px;
+  background:#e8f5e9;
+  padding:20px;
+  border-radius:25px;
+  font-size:20px;
+  font-weight:600;
+}
+
+/* Footer */
+.footer{
+  display:flex;
+  justify-content:space-between;
+  margin-top:50px;
+  padding:0 70px;
+}
+.line{
+  width:230px;
+  border-top:1px solid #000;
+  margin-bottom:6px;
+}
+
+#qrcode{
+  margin-top:25px;
+  display:flex;
+  justify-content:center;
+}
+
+/* Button */
+button{
+  margin-top:30px;
+  padding:15px 40px;
+  border:none;
+  border-radius:20px;
+  background:linear-gradient(45deg,#1b5e20,#66bb6a);
+  color:white;
+  font-size:16px;
+  cursor:pointer;
+}
+
+.logo{
+  width:120px;
+  background:white;
+  padding:6px;
+  border-radius:10px;
+}
+
+
+</style>
+</head>
+
+<body>
+
+<div id="blocked">
+  <h1>🚫 Access Denied</h1>
+  <p>Certificate available only for registered players.</p>
+</div>
+
+<div id="frame">
+  <div id="certificate">
+
+    <div class="header" style="justify-content:center">
+  <img src="game_logo.png" class="logo">
+</div>
+
+
+    
+
+    <h1>Certificate of Achievement</h1>
+    <div class="subtitle">Environmental Awareness & Water Conservation</div>
+
+    <div class="ribbon">Eco Hero – Water Saver Defender</div>
+
+    <div class="recipient">
+      This certificate is proudly presented to
+      <div id="name"></div>
+    </div>
+
+    <div class="description">
+      In recognition of the successful completion of the interactive educational game
+      <b>“Eco Hero – Water Saver Defender”</b>, demonstrating responsibility and commitment
+      towards water conservation and environmental sustainability.
+    </div>
+
+    <div class="info">
+      <p><span>Player Status</span><b>Registered User</b></p>
+      <p><span>Completion Status</span><b>Successfully Completed</b></p>
+      <p><span>Date of Issue</span><b id="date"></b></p>
+      <p><span>Certificate Number</span><b id="cid"></b></p>
+    </div>
+
+    <div class="score">
+      Eco Performance Score<br>
+      <span id="score"></span>
+    </div>
+
+    <div class="footer" style="justify-content:center">
+  <div style="text-align:center">
+    <img src="game_designer_sign.png" style="width:180px;margin-bottom:6px;">
+    <div class="line"></div>
+    Game Designer
+  </div>
+</div>
+
+
+    <div id="qrcode"></div>
+
+  
+
+
+  </div>
+
+  <center>
+    <button onclick="downloadCert()">⬇ Download Certificate</button>
+  </center>
+</div>
+
+
+
+<!-- Libraries -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
+<script>
+/* ===== SECURITY CHECK ===== */
+if(localStorage.getItem("is_registered") !== "true"){
+  document.getElementById("frame").style.display = "none";
+  document.getElementById("blocked").style.display = "block";
+  throw new Error("Not Registered");
+}
+
+/* ===== READ DATA FROM subha.html ===== */
+const name  = localStorage.getItem("current_user") || "Player";
+const score = localStorage.getItem("eco_score") || 0;
+
+/* ===== FILL DATA ===== */
+document.getElementById("name").innerText = name;
+document.getElementById("score").innerText = score;
+document.getElementById("date").innerText = new Date().toLocaleDateString();
+
+const cid = "ECO-" + Math.floor(100000 + Math.random() * 900000);
+document.getElementById("cid").innerText = cid;
+
+/* ===== QR CODE ===== */
+const qrDiv = document.getElementById("qrcode");
+qrDiv.innerHTML = "";
+new QRCode(qrDiv,{
+  text:
+    "Eco Hero Certificate\n" +
+    "Name: " + name + "\n" +
+    "Score: " + score + "\n" +
+    "Certificate ID: " + cid,
+  width:140,
+  height:140
+});
+
+/* ===== VOICE (EN + TA) ===== */
+if(window.speechSynthesis){
+  speechSynthesis.cancel();
+  const en = new SpeechSynthesisUtterance(
+    `Congratulations ${name}. You have successfully completed Eco Hero Water Saver Defender.`
+  );
+  en.lang = "en-IN";
+
+  const ta = new SpeechSynthesisUtterance(
+    `வாழ்த்துகள் ${name}. நீங்கள் ஈகோ ஹீரோ விளையாட்டை வெற்றிகரமாக முடித்துள்ளீர்கள்.`
+  );
+  ta.lang = "ta-IN";
+
+  speechSynthesis.speak(en);
+  setTimeout(()=>speechSynthesis.speak(ta),3000);
+}
+
+/* ===== DOWNLOAD CERTIFICATE ===== */
+function downloadCert(){
+  const cert = document.getElementById("certificate");
+  html2canvas(cert,{
+    scale:2,
+    useCORS:true,
+    backgroundColor:"#ffffff"
+  }).then(canvas=>{
+    const link=document.createElement("a");
+    link.download="Eco_Hero_Certificate.png";
+    link.href=canvas.toDataURL("image/png");
+    link.click();
+  });
+}
+</script>
+
+</body>
+</html>
